@@ -76,19 +76,21 @@ def line_needs_semicolon(line):
     line_split = line.split()
     return is_initializer(line_split) or is_declaration(line_split)
 
-def prepp_file(file):
+def prepp_file(filename, file):
     indent = 0
     ws_type = 0
     line = ''
+    line_num = 0
     stack = [False]
     for line in file:
+        line_num = line_num + 1
         line = line.rstrip()
         line, next_indent, next_ws_type = categorize(line, indent, ws_type)
         if ws_type == 0:
             ws_type = next_ws_type
 
         if next_ws_type != ws_type:
-            error('found mismatched tabs/spaces {} -> {} at line:\n{}'.format(ws_type, next_ws_type, line))
+            error('{}:{}: found mismatched tabs/spaces {} -> {} at line:\n{}'.format(filename, line_num, ws_type, next_ws_type, line))
 
         if len(line) == 0:
             continue
@@ -98,6 +100,8 @@ def prepp_file(file):
         if next_indent == indent + 1:
             stack.append(needs_semicolon)
             print get_indent(ws_type, indent) + '{'
+        elif next_indent > indent + 1:
+            error('{}:{}: unexpected multiple indent'.format(filename, line_num))
         elif indent > next_indent:
             while indent > next_indent:
                 # TODO print indents
@@ -123,7 +127,7 @@ def prepp_file(file):
 def prepp_filename(filename):
     try:
         with open(filename) as file:
-            prepp_file(file)
+            prepp_file(filename, file)
     except IOError:
        print("failed to open {}".format(filename))
        sys.exit(1)

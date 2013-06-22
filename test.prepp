@@ -1,0 +1,17 @@
+struct X
+	int y;
+do();
+if (true)
+	do();
+struct P
+	struct Q
+		int f;
+do();
+int *p =
+	4,
+	3,
+	5, 234, 34,
+struct asdf
+	class asdf : k
+		for (int i = 0; i < 34; ++i)
+			printf(i);

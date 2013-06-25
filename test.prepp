@@ -1,17 +1,12 @@
-struct X
-	int y;
-do();
-if (true)
-	do();
-struct P
-	struct Q
-		int f;
-do();
-int *p =
-	4,
-	3,
-	5, 234, 34,
-struct asdf
-	class asdf : k
-		for (int i = 0; i < 34; ++i)
-			printf(i);
+#include <stdio.h>
+#include <stdlib.h>
+
+struct foo
+	int x, y;
+
+int main()
+	printf("Hello world. \n");
+	foo f;
+	f.x = 0;
+	f.y = int(3.4);
+	return EXIT_SUCCESS;

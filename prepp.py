@@ -18,9 +18,6 @@ def usage():
     print "prepp <ext> <filename>"
     sys.exit(1)
 
-if len(sys.argv) != 3:
-    usage()
-
 ws_tabs = 1
 ws_spaces = 2
 
@@ -76,12 +73,18 @@ def line_needs_semicolon(line):
     line_split = line.split()
     return is_initializer(line_split) or is_declaration(line_split)
 
+def print_line_no(filename, line_num):
+    print "#line {} \"{}\"".format(line_num, filename)
+    return line_num
+
 def prepp_file(filename, file):
     indent = 0
     ws_type = 0
     line = ''
     line_num = 0
     stack = [False]
+    last_printed = print_line_no(filename, 0)
+    dirty_line = True
     for line in file:
         line_num = line_num + 1
         line = line.rstrip()
@@ -99,6 +102,8 @@ def prepp_file(filename, file):
         needs_semicolon = line_needs_semicolon(line)
         if next_indent == indent + 1:
             stack.append(needs_semicolon)
+            print_line_no(filename, last_printed)
+            dirty_line = True
             print get_indent(ws_type, indent) + '{'
         elif next_indent > indent + 1:
             error('{}:{}: unexpected multiple indent'.format(filename, line_num))
@@ -108,8 +113,15 @@ def prepp_file(filename, file):
                 indent = indent - 1
                 stack.pop()
                 inner_needs_semicolon = stack[-1]
+                print_line_no(filename, last_printed)
+                dirty_line = True
                 print get_indent(ws_type, indent) + '}' + (';' if inner_needs_semicolon else '')
         stack[-1] = needs_semicolon
+
+        if dirty_line:
+            print_line_no(filename, line_num)
+            dirty_line = False
+        last_printed = line_num
 
         print prefix + line
 
@@ -121,6 +133,7 @@ def prepp_file(filename, file):
         indent = indent - 1
         stack.pop()
         inner_needs_semicolon = stack[-1]
+        print_line_no(filename, last_printed)
         print get_indent(ws_type, indent) + '}' + (';' if inner_needs_semicolon else '')
 
 
@@ -132,8 +145,14 @@ def prepp_filename(filename):
        print("failed to open {}".format(filename))
        sys.exit(1)
 
-target_ext = sys.argv[1]
-filename = sys.argv[2]
+if len(sys.argv) < 3:
+    usage()
 
-prepp_filename(filename)
+target = sys.argv[1]
+
+if target == 'cpp':
+    filename = sys.argv[2]
+    prepp_filename(filename)
+
 sys.exit(0)
+

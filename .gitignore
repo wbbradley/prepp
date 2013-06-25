@@ -1,3 +1,8 @@
 *.pyc
 *.swp
 *.o
+*.ii
+*.prepp.cpp
+*.plist
+test
+build/

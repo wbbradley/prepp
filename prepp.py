@@ -62,6 +62,8 @@ def is_declaration(line_tokens):
         return True
     if line_tokens[0] == 'enum':
         return True
+    if line_tokens[0] == 'union':
+        return True
     return False
 
 def is_initializer(line_tokens):
